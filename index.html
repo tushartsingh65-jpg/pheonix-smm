@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PHEONIX SMM - Social Media Marketing</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    :root {
+      --bg: #121214;
+      --bg-2: #141418;
+      --panel: #1c1c21;
+      --panel-2: #18181c;
+      --muted: #8e8e93;
+      --soft: #a1a1aa;
+      --border: #2a2a32;
+      --border-2: #27272a;
+      --accent: #ff5500;
+      --accent-dark: #e04b00;
+      --success: #22c55e;
+      --warning: #ffcc00;
+      --text: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      letter-spacing: 0.4px;
+    }
+
+    .three-dots-btn {
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .three-dots-btn:hover {
+      background-color: #2a2a32;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      z-index: 998;
+    }
+
+    .menu-overlay.show {
+      display: block;
+    }
+
+    .nav-drawer {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 260px;
+      height: 100%;
+      background-color: var(--panel-2);
+      border-left: 1px solid var(--border);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      gap: 12px;
+      transition: right 0.3s ease;
+    }
+
+    .nav-drawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 8px;
+    }
+
+    .drawer-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .close-drawer {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .drawer-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--panel);
+      border: 1px solid #27272a;
+      color: var(--text);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .drawer-item:hover,
+    .drawer-item.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background-color: rgba(255, 85, 0, 0.05);
+    }
+
+    .hero-card {
+      background-color: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-tagline {
+      color: var(--soft);
+      font-size: 13px;
+      margin-top: -8px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .stat-box {
+      background-color: var(--bg-2);
+      border: 1px solid var(--border-2);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stat-value.live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success);
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    .filters-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .filters-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-btn {
+      background-color: var(--panel);
+      border: 1px solid #2e2e38;
+      color: var(--soft);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .services-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .service-card {
+      background-color: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .service-card.selected {
+      border-color: var(--accent);
+    }
+
+    .platform-tag {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .service-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .service-desc {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .price-tag {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .price-tag span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .btn-order-now {
+      background-color: var(--accent);
+      color: var(--text);
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-order-now:hover {
+      background-color: var(--accent-dark);
+    }
+
+    .page-section {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .page-section.active {
+      display: flex;
+    }
+
+    .section-card {
+      background-color: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .wallet-label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .wallet-balance {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--success);
+    }
+
+    .btn-add-funds {
+      background-color: var(--accent);
+      border: none;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-add-funds:hover {
+      background-color: var(--accent-dark);
+    }
+
+    .qr-card {
+      background: #ffffff;
+      color: #000000;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .qr-user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #1c1c21;
+    }
+
+    .qr-user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--warning);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .qr-image-container {
+      width: 220px;
+      height: 220px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .upi-id-box {
+      background: #f1f5f9;
+      border: 1px dashed #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      word-break: break-all;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-copy {
+      background: var(--accent);
+      color: var(--text);
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .section-heading {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .empty-text {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      color: var(--soft);
+    }
+
+    .form-input {
+      background-color: #141418;
+      border: 1px solid #2d2d38;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+    }
+
+    .order-summary-price {
+      font-size: 12px;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .support-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background-color: #141418;
+      border: 1px solid #27272a;
+      padding: 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+
+    .support-card:hover {
+      border-color: var(--accent);
+    }
+
+    .support-icon {
+      font-size: 24px;
+    }
+
+    .support-info-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .support-info-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: #1e1e24;
+      border: 1px solid #33333f;
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .order-item {
+      background-color: #141418;
+      border: 1px solid #27272a;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      gap: 8px;
+    }
+
+    .order-item-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .order-item-sub {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .order-status {
+      background-color: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #666670;
+      padding: 16px 0 24px;
+    }
+
+    .wallet-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip-btn {
+      background-color: #141418;
+      border: 1px solid #2d2d38;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .chip-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background-color: rgba(255, 85, 0, 0.08);
+    }
+
+    .track-result {
+      padding-top: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .track-result.visible {
+      display: flex;
+    }
+
+    .mini-box {
+      background-color: #141418;
+      border: 1px solid #2d2d38;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mini-label {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .mini-value {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="top-bar">
+      <div class="nav-brand" onclick="switchSection('home')">🔥 PHEONIX SMM</div>
+      <button class="three-dots-btn" onclick="toggleMenu()" aria-label="Open Menu">⋮</button>
+    </div>
+
+    <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+    <div class="nav-drawer" id="nav-drawer">
+      <div class="drawer-header">
+        <span class="drawer-title">Navigation</span>
+        <button class="close-drawer" onclick="toggleMenu()">✕</button>
+      </div>
+      <a class="drawer-item active" id="nav-home" onclick="switchSection('home')">
+        <span>🏠</span> Home
+      </a>
+      <a class="drawer-item" id="nav-track" onclick="switchSection('track')">
+        <span>📦</span> Track Order
+      </a>
+      <a class="drawer-item" id="nav-wallet" onclick="switchSection('wallet')">
+        <span>💳</span> Add Wallet Funds
+      </a>
+      <a class="drawer-item" id="nav-support" onclick="switchSection('support')">
+        <span>🎧</span> Customer Service
+      </a>
+    </div>
+
+    <div class="page-section active" id="section-home">
+      <div class="hero-card">
+        <div>
+          <div class="brand-title">
+            <span class="icon">🔥</span> PHEONIX SMM
+          </div>
+          <p class="brand-tagline">Fast • Affordable • Reliable Social Media Marketing</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-label">Starting from</span>
+            <span class="stat-value">₹5</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Services</span>
+            <span class="stat-value">30+</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Order status</span>
+            <span class="stat-value live"><span class="live-dot"></span> Live</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card" style="padding: 14px 20px; flex-direction: row; justify-content: space-between; align-items: center;">
+        <div>
+          <div class="wallet-label">Available Balance</div>
+          <div class="wallet-balance" id="home-wallet-balance">₹0.00</div>
+        </div>
+        <button class="btn-add-funds" style="width: auto; padding: 8px 16px;" onclick="switchSection('wallet')">
+          + Add Money
+        </button>
+      </div>
+
+      <div class="filters-container" id="filters">
+        <button class="filter-btn active" onclick="filterServices('All', this)">All</button>
+        <button class="filter-btn" onclick="filterServices('Instagram', this)">Instagram</button>
+        <button class="filter-btn" onclick="filterServices('YouTube', this)">YouTube</button>
+        <button class="filter-btn" onclick="filterServices('TikTok', this)">TikTok</button>
+        <button class="filter-btn" onclick="filterServices('Facebook', this)">Facebook</button>
+      </div>
+
+      <div class="services-list" id="services-list"></div>
+
+      <div class="section-card" id="place-order-card">
+        <h3 class="section-heading">Place Order</h3>
+        <div id="selected-service-info" style="font-size: 13px; color: #ff5500; font-weight: 600;">
+          Selected: Instagram Real Followers (₹35 / 1K)
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="quantity-input">Quantity</label>
+          <input type="number" id="quantity-input" class="form-input" placeholder="e.g. 1000" min="100" value="1000" oninput="calculateTotal()" />
+          <span class="order-summary-price" id="total-price-text">Total Price: ₹35.00</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="link-input">Profile / Post / Reel Link</label>
+          <input type="text" id="link-input" class="form-input" placeholder="https://instagram.com/..." />
+        </div>
+
+        <button class="btn-order-now" onclick="confirmOrder()">Confirm Order</button>
+      </div>
+
+      <div class="section-card">
+        <h3 class="section-heading">Recent Orders</h3>
+        <div id="recent-orders-list">
+          <p class="empty-text">No orders placed yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-section" id="section-track">
+      <div class="section-card">
+        <h3 class="section-heading">Track Your Order</h3>
+        <p class="empty-text">Enter your Order ID below to check live status.</p>
+
+        <div class="form-group">
+          <label class="form-label" for="track-id-input">Order ID</label>
+          <input type="text" id="track-id-input" class="form-input" placeholder="e.g. #48291" />
+        </div>
+
+        <button class="btn-order-now" onclick="trackOrder()">Track Order</button>
+
+        <div class="track-result" id="track-result">
+          <div class="mini-box">
+            <span class="mini-label">Order</span>
+            <span class="mini-value" id="track-order-id">#48291</span>
+          </div>
+          <div class="mini-box">
+            <span class="mini-label">Service</span>
+            <span class="mini-value" id="track-service">Instagram Real Followers</span>
+          </div>
+          <div class="mini-box">
+            <span class="mini-label">Status</span>
+            <span class="mini-value" id="track-status">In Progress</span>
+          </div>
+          <div class="mini-box">
+            <span class="mini-label">ETA</span>
+            <span class="mini-value" id="track-eta">2-4 Hours</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-section" id="section-wallet">
+      <div class="section-card">
+        <h3 class="section-heading">Add Wallet Funds</h3>
+        <div>
+          <div class="wallet-label">Current Balance</div>
+          <div class="wallet-balance" id="wallet-balance">₹0.00</div>
+        </div>
+
+        <div class="wallet-actions">
+          <button class="chip-btn active" onclick="setWalletTopUp(250)">₹250</button>
+          <button class="chip-btn" onclick="setWalletTopUp(500)">₹500</button>
+          <button class="chip-btn" onclick="setWalletTopUp(1000)">₹1,000</button>
+          <button class="chip-btn" onclick="setWalletTopUp(2000)">₹2,000</button>
+        </div>
+
+        <div class="qr-card">
+          <div class="qr-user-info">
+            <div class="qr-user-avatar">P</div>
+            <span>PHEONIX SMM</span>
+          </div>
+
+          <div class="qr-image-container">
+            <img alt="QR Code" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Crect width='220' height='220' fill='%23ffffff'/%3E%3Cg fill='%23000000'%3E%3Crect x='20' y='20' width='16' height='16'/%3E%3Crect x='20' y='60' width='16' height='16'/%3E%3Crect x='20' y='100' width='16' height='16'/%3E%3Crect x='20' y='140' width='16' height='16'/%3E%3Crect x='20' y='180' width='16' height='16'/%3E%3Crect x='60' y='20' width='16' height='16'/%3E%3Crect x='60' y='52' width='16' height='16'/%3E%3Crect x='60' y='84' width='16' height='16'/%3E%3Crect x='60' y='116' width='16' height='16'/%3E%3Crect x='60' y='180' width='16' height='16'/%3E%3Crect x='100' y='20' width='16' height='16'/%3E%3Crect x='100' y='52' width='16' height='16'/%3E%3Crect x='100' y='84' width='16' height='16'/%3E%3Crect x='100' y='116' width='16' height='16'/%3E%3Crect x='100' y='148' width='16' height='16'/%3E%3Crect x='100' y='180' width='16' height='16'/%3E%3Crect x='140' y='20' width='16' height='16'/%3E%3Crect x='140' y='60' width='16' height='16'/%3E%3Crect x='140' y='100' width='16' height='16'/%3E%3Crect x='140' y='140' width='16' height='16'/%3E%3Crect x='140' y='180' width='16' height='16'/%3E%3Crect x='180' y='20' width='16' height='16'/%3E%3Crect x='180' y='52' width='16' height='16'/%3E%3Crect x='180' y='84' width='16' height='16'/%3E%3Crect x='180' y='116' width='16' height='16'/%3E%3Crect x='180' y='148' width='16' height='16'/%3E%3Crect x='180' y='180' width='16' height='16'/%3E%3Crect x='44' y='136' width='16' height='16'/%3E%3Crect x='80' y='136' width='16' height='16'/%3E%3Crect x='116' y='136' width='16' height='16'/%3E%3Crect x='160' y='136' width='16' height='16'/%3E%3Crect x='44' y='172' width='16' height='16'/%3E%3Crect x='80' y='172' width='16' height='16'/%3E%3Crect x='116' y='172' width='16' height='16'/%3E%3Crect x='160' y='172' width='16' height='16'/%3E%3C/g%3E%3C/svg%3E" />
+          </div>
+
+          <div class="upi-id-box">
+            <span id="upi-id">pheonixsmm@upi</span>
+            <button class="btn-copy" onclick="copyUPI()">Copy</button>
+          </div>
+        </div>
+
+        <button class="btn-add-funds" onclick="addFunds()">Add ₹250 to Wallet</button>
+      </div>
+    </div>
+
+    <div class="page-section" id="section-support">
+      <div class="section-card">
+        <h3 class="section-heading">Customer Service</h3>
+
+        <a class="support-card" href="https://wa.me/919999999999" target="_blank" rel="noreferrer">
+          <span class="support-icon">💬</span>
+          <div>
+            <div class="support-info-title">WhatsApp Support</div>
+            <div class="support-info-sub">Chat with us instantly</div>
+          </div>
+        </a>
+
+        <a class="support-card" href="https://t.me/pheonixsmm" target="_blank" rel="noreferrer">
+          <span class="support-icon">📨</span>
+          <div>
+            <div class="support-info-title">Telegram</div>
+            <div class="support-info-sub">Fast replies & updates</div>
+          </div>
+        </a>
+
+        <a class="support-card" href="mailto:hello@pheonixsmm.com">
+          <span class="support-icon">✉️</span>
+          <div>
+            <div class="support-info-title">Email Support</div>
+            <div class="support-info-sub">hello@pheonixsmm.com</div>
+          </div>
+        </a>
+
+        <a class="support-card" href="tel:+919999999999">
+          <span class="support-icon">📞</span>
+          <div>
+            <div class="support-info-title">Call Us</div>
+            <div class="support-info-sub">+91 99999 99999</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <footer>© 2026 PHEONIX SMM</footer>
+  </div>
+
+  <div class="toast" id="toast">Saved</div>
+
+  <script>
+    const services = [
+      { id: 1, platform: 'Instagram', title: 'Real Followers', price: 35, unit: '1K', description: 'High-retention Instagram followers with fast delivery.', active: true },
+      { id: 2, platform: 'Instagram', title: 'Reel Views', price: 18, unit: '1K', description: 'Boost your reels with quick reach and organic style growth.', active: false },
+      { id: 3, platform: 'Instagram', title: 'Story Views', price: 12, unit: '1K', description: 'Increase story impressions and engagement instantly.', active: false },
+      { id: 4, platform: 'YouTube', title: 'Subscribers', price: 55, unit: '100', description: 'Grow your channel with real-sounding new subscribers.', active: false },
+      { id: 5, platform: 'YouTube', title: 'Watch Hours', price: 72, unit: '100H', description: 'Boost watch time for better video visibility.', active: false },
+      { id: 6, platform: 'YouTube', title: 'Video Views', price: 24, unit: '1K', description: 'Improve reach for new and existing uploads.', active: false },
+      { id: 7, platform: 'TikTok', title: 'Video Likes', price: 16, unit: '1K', description: 'Increase likes and social proof faster.', active: false },
+      { id: 8, platform: 'TikTok', title: 'Followers', price: 30, unit: '1K', description: 'Grow your audience quickly and authentically.', active: false },
+      { id: 9, platform: 'TikTok', title: 'Views', price: 20, unit: '1K', description: 'Push your content into front-feed exposure.', active: false },
+      { id: 10, platform: 'Facebook', title: 'Page Likes', price: 40, unit: '100', description: 'Increase likes and credibility for your pages.', active: false },
+      { id: 11, platform: 'Facebook', title: 'Post Reach', price: 28, unit: '1K', description: 'Expand page reach across feeds and audiences.', active: false },
+      { id: 12, platform: 'Facebook', title: 'Video Views', price: 22, unit: '1K', description: 'Drive extra views for reels and promotional content.', active: false }
+    ];
+
+    let selectedService = services[0];
+    let walletBalance = parseFloat(localStorage.getItem('pheonix_wallet') || '0');
+    let topUpAmount = 250;
+
+    function formatCurrency(value) {
+      return `₹${Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function updateWalletDisplay() {
+      const balance = walletBalance || 0;
+      const display = formatCurrency(balance);
+      document.getElementById('home-wallet-balance').textContent = display;
+      document.getElementById('wallet-balance').textContent = display;
+      localStorage.setItem('pheonix_wallet', String(balance));
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast.timeoutId);
+      showToast.timeoutId = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    function renderServices(platform = 'All') {
+      const container = document.getElementById('services-list');
+      const filtered = platform === 'All'
+        ? services
+        : services.filter(item => item.platform === platform);
+
+      container.innerHTML = filtered.map((service) => `
+        <div class="service-card ${selectedService && selectedService.id === service.id ? 'selected' : ''}" data-id="${service.id}" onclick="selectService(${service.id})">
+          <div class="platform-tag">${service.platform}</div>
+          <div class="service-title">${service.title}</div>
+          <p class="service-desc">${service.description}</p>
+          <div class="price-tag">₹${service.price}<span> / ${service.unit}</span></div>
+        </div>
+      `).join('');
+
+      if (!selectedService || !filtered.some(item => item.id === selectedService.id)) {
+        selectedService = filtered[0] || services[0];
+      }
+
+      updateSelectedServiceInfo();
+    }
+
+    function filterServices(platform, btn) {
+      document.querySelectorAll('.filter-btn').forEach(button => button.classList.remove('active'));
+      btn.classList.add('active');
+      renderServices(platform);
+    }
+
+    function selectService(serviceId) {
+      const service = services.find(item => item.id === serviceId);
+      if (!service) return;
+      selectedService = service;
+      renderServices(document.querySelector('.filter-btn.active')?.textContent || 'All');
+      calculateTotal();
+    }
+
+    function updateSelectedServiceInfo() {
+      const info = document.getElementById('selected-service-info');
+      if (!selectedService) return;
+      info.textContent = `Selected: ${selectedService.platform} ${selectedService.title} (₹${selectedService.price} / ${selectedService.unit})`;
+    }
+
+    function calculateTotal() {
+      const qtyInput = document.getElementById('quantity-input');
+      const qty = Math.max(Number(qtyInput.value) || 0, 0);
+      const total = (selectedService.price * qty) / 1000;
+      const totalText = document.getElementById('total-price-text');
+      totalText.textContent = `Total Price: ${formatCurrency(total)}`;
+      return total;
+    }
+
+    function confirmOrder() {
+      const qty = Number(document.getElementById('quantity-input').value) || 0;
+      const link = document.getElementById('link-input').value.trim();
+      const total = calculateTotal();
+
+      if (!selectedService) {
+        showToast('Please select a service.');
+        return;
+      }
+
+      if (qty < 100) {
+        showToast('Minimum order quantity is 100.');
+        return;
+      }
+
+      if (!link) {
+        showToast('Please add a valid profile/post/reel link.');
+        return;
+      }
+
+      if (walletBalance < total) {
+        showToast('Insufficient wallet balance. Please add funds first.');
+        switchSection('wallet');
+        return;
+      }
+
+      walletBalance -= total;
+      updateWalletDisplay();
+
+      const order = {
+        id: `#${Math.floor(10000 + Math.random() * 90000)}`,
+        service: `${selectedService.platform} ${selectedService.title}`,
+        amount: total,
+        link,
+        status: 'Processing',
+        eta: '2-4 Hours',
+        createdAt: new Date().toLocaleString()
+      };
+
+      const prevOrders = JSON.parse(localStorage.getItem('pheonix_orders') || '[]');
+      prevOrders.unshift(order);
+      localStorage.setItem('pheonix_orders', JSON.stringify(prevOrders.slice(0, 6)));
+
+      renderRecentOrders();
+      document.getElementById('link-input').value = '';
+      showToast(`Order ${order.id} placed successfully.`);
+      switchSection('track');
+      document.getElementById('track-id-input').value = order.id;
+      trackOrder();
+    }
+
+    function renderRecentOrders() {
+      const list = document.getElementById('recent-orders-list');
+      const orders = JSON.parse(localStorage.getItem('pheonix_orders') || '[]');
+
+      if (!orders.length) {
+        list.innerHTML = '<p class="empty-text">No orders placed yet.</p>';
+        return;
+      }
+
+      list.innerHTML = orders.map(order => `
+        <div class="order-item">
+          <div>
+            <div class="order-item-title">${order.service}</div>
+            <div class="order-item-sub">${order.id} • ${formatCurrency(order.amount)}</div>
+          </div>
+          <div class="order-status">${order.status}</div>
+        </div>
+      `).join('');
+    }
+
+    function switchSection(section) {
+      const sections = ['home', 'track', 'wallet', 'support'];
+      sections.forEach(key => {
+        const sectionEl = document.getElementById(`section-${key}`);
+        if (sectionEl) sectionEl.classList.toggle('active', key === section);
+        const navEl = document.getElementById(`nav-${key}`);
+        if (navEl) navEl.classList.toggle('active', key === section);
+      });
+      toggleMenu(false);
+    }
+
+    function toggleMenu(forceState) {
+      const overlay = document.getElementById('menu-overlay');
+      const drawer = document.getElementById('nav-drawer');
+      const isOpen = typeof forceState === 'boolean' ? forceState : drawer.classList.contains('open');
+      drawer.classList.toggle('open', !isOpen);
+      overlay.classList.toggle('show', !isOpen);
+    }
+
+    function setWalletTopUp(amount) {
+      topUpAmount = amount;
+      const buttons = document.querySelectorAll('.chip-btn');
+      buttons.forEach((btn) => btn.classList.toggle('active', Number(btn.textContent.replace(/[₹,]/g, '')) === amount));
+      document.querySelector('.btn-add-funds').textContent = `Add ${formatCurrency(amount)} to Wallet`;
+    }
+
+    function addFunds() {
+      walletBalance += topUpAmount;
+      updateWalletDisplay();
+      showToast(`${formatCurrency(topUpAmount)} added to wallet.`);
+    }
+
+    function copyUPI() {
+      const upi = document.getElementById('upi-id').textContent;
+      navigator.clipboard.writeText(upi).then(() => {
+        showToast('UPI ID copied.');
+      }).catch(() => {
+        showToast('Copy failed. Please copy manually.');
+      });
+    }
+
+    function trackOrder() {
+      const input = document.getElementById('track-id-input').value.trim();
+      const result = document.getElementById('track-result');
+      const orders = JSON.parse(localStorage.getItem('pheonix_orders') || '[]');
+      const match = orders.find(order => order.id.toLowerCase() === input.toLowerCase());
+
+      if (!match) {
+        result.classList.remove('visible');
+        showToast('Order not found.');
+        return;
+      }
+
+      document.getElementById('track-order-id').textContent = match.id;
+      document.getElementById('track-service').textContent = match.service;
+      document.getElementById('track-status').textContent = match.status;
+      document.getElementById('track-eta').textContent = match.eta;
+      result.classList.add('visible');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderServices('All');
+      updateWalletDisplay();
+      renderRecentOrders();
+      setWalletTopUp(250);
+      calculateTotal();
+    });
+  </script>
+</body>
+</html>
