@@ -29,9 +29,7 @@
       --shadow: rgba(0, 0, 0, 0.5);
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
       background-color: var(--bg);
@@ -116,9 +114,7 @@
       transition: right 0.3s ease;
     }
 
-    .nav-drawer.open {
-      right: 0;
-    }
+    .nav-drawer.open { right: 0; }
 
     .drawer-header {
       display: flex;
@@ -240,9 +236,7 @@
       scrollbar-width: none;
     }
 
-    .filters-container::-webkit-scrollbar {
-      display: none;
-    }
+    .filters-container::-webkit-scrollbar { display: none; }
 
     .filter-btn {
       background-color: var(--panel);
@@ -281,9 +275,7 @@
       cursor: pointer;
     }
 
-    .service-card.selected {
-      border-color: var(--accent);
-    }
+    .service-card.selected { border-color: var(--accent); }
 
     .platform-tag {
       font-size: 11px;
@@ -519,9 +511,7 @@
       transition: border-color 0.2s;
     }
 
-    .support-card:hover {
-      border-color: var(--accent);
-    }
+    .support-card:hover { border-color: var(--accent); }
 
     .support-icon {
       font-size: 24px;
@@ -629,9 +619,7 @@
       gap: 12px;
     }
 
-    .track-result.visible {
-      display: flex;
-    }
+    .track-result.visible { display: flex; }
 
     .mini-box {
       background-color: #141418;
@@ -866,6 +854,7 @@
 
   <div class="toast" id="toast">Saved</div>
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
     const services = [
       { id: 1, platform: 'Instagram', title: 'Real Followers', price: 35, unit: '1K', description: 'High-retention Instagram followers with fast delivery.', active: true },
@@ -882,9 +871,11 @@
       { id: 12, platform: 'Facebook', title: 'Video Views', price: 22, unit: '1K', description: 'Drive extra views for reels and promotional content.', active: false }
     ];
 
+    const API_BASE = 'http://localhost:3000/api';
     let selectedService = services[0];
     let walletBalance = parseFloat(localStorage.getItem('pheonix_wallet') || '0');
     let topUpAmount = 250;
+    let pendingCheckout = null;
 
     function formatCurrency(value) {
       return `₹${Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -906,11 +897,116 @@
       showToast.timeoutId = setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
+    async function createRazorpaySession({ amount, purpose, type, metadata }) {
+      const response = await fetch(`${API_BASE}/payment/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount,
+          userId: 'demo-user',
+          type,
+          service: purpose,
+          link: metadata?.link || ''
+        })
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Unable to create payment order');
+      }
+
+      return data;
+    }
+
+    async function verifyPayment(paymentData, type, metadata) {
+      const response = await fetch(`${API_BASE}/payment/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id: paymentData.razorpay_order_id,
+          razorpay_payment_id: paymentData.razorpay_payment_id,
+          razorpay_signature: paymentData.razorpay_signature,
+          userId: 'demo-user',
+          amount: metadata.amount,
+          type,
+          service: metadata.service,
+          link: metadata.link || ''
+        })
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || 'Payment verification failed');
+      }
+
+      return result;
+    }
+
+    function openRazorpayCheckout({ amount, service, type, metadata }) {
+      createRazorpaySession({ amount, purpose: service, type, metadata })
+        .then((data) => {
+          const options = {
+            key: data.key,
+            amount: data.order.amount,
+            currency: data.order.currency,
+            name: 'PHEONIX SMM',
+            description: service,
+            order_id: data.order.id,
+            handler: async function (response) {
+              try {
+                const verified = await verifyPayment(response, type, { ...metadata, amount, service });
+
+                if (type === 'wallet') {
+                  walletBalance = Number(verified.walletBalance || 0);
+                  updateWalletDisplay();
+                  showToast(`${formatCurrency(amount)} added to wallet.`);
+                } else {
+                  const order = verified.order;
+                  const prevOrders = JSON.parse(localStorage.getItem('pheonix_orders') || '[]');
+                  prevOrders.unshift({
+                    id: order.id,
+                    service: order.service,
+                    amount: order.amount,
+                    status: order.status,
+                    eta: '2-4 Hours',
+                    link: order.link
+                  });
+                  localStorage.setItem('pheonix_orders', JSON.stringify(prevOrders.slice(0, 6)));
+                  renderRecentOrders();
+                  showToast(`Order ${order.id} placed successfully.`);
+                  switchSection('track');
+                  document.getElementById('track-id-input').value = order.id;
+                  trackOrder();
+                }
+              } catch (error) {
+                showToast(error.message || 'Payment verification failed');
+              }
+            },
+            theme: {
+              color: '#ff5500'
+            },
+            modal: {
+              ondismiss: function () {
+                showToast('Payment cancelled');
+              }
+            },
+            prefill: {
+              email: 'customer@example.com'
+            }
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.open();
+        })
+        .catch((error) => {
+          console.error(error);
+          showToast(error.message || 'Could not start payment.');
+        });
+    }
+
     function renderServices(platform = 'All') {
       const container = document.getElementById('services-list');
-      const filtered = platform === 'All'
-        ? services
-        : services.filter(item => item.platform === platform);
+      const filtered = platform === 'All' ? services : services.filter(item => item.platform === platform);
 
       container.innerHTML = filtered.map((service) => `
         <div class="service-card ${selectedService && selectedService.id === service.id ? 'selected' : ''}" data-id="${service.id}" onclick="selectService(${service.id})">
@@ -977,35 +1073,25 @@
         return;
       }
 
-      if (walletBalance < total) {
-        showToast('Insufficient wallet balance. Please add funds first.');
-        switchSection('wallet');
-        return;
-      }
-
-      walletBalance -= total;
-      updateWalletDisplay();
-
-      const order = {
-        id: `#${Math.floor(10000 + Math.random() * 90000)}`,
-        service: `${selectedService.platform} ${selectedService.title}`,
-        amount: total,
-        link,
-        status: 'Processing',
-        eta: '2-4 Hours',
-        createdAt: new Date().toLocaleString()
+      pendingCheckout = {
+        type: 'order',
+        metadata: {
+          amount: total,
+          service: `${selectedService.platform} ${selectedService.title}`,
+          link
+        }
       };
 
-      const prevOrders = JSON.parse(localStorage.getItem('pheonix_orders') || '[]');
-      prevOrders.unshift(order);
-      localStorage.setItem('pheonix_orders', JSON.stringify(prevOrders.slice(0, 6)));
-
-      renderRecentOrders();
-      document.getElementById('link-input').value = '';
-      showToast(`Order ${order.id} placed successfully.`);
-      switchSection('track');
-      document.getElementById('track-id-input').value = order.id;
-      trackOrder();
+      openRazorpayCheckout({
+        amount: total,
+        service: `${selectedService.platform} ${selectedService.title}`,
+        type: 'order',
+        metadata: {
+          amount: total,
+          service: `${selectedService.platform} ${selectedService.title}`,
+          link
+        }
+      });
     }
 
     function renderRecentOrders() {
@@ -1055,9 +1141,12 @@
     }
 
     function addFunds() {
-      walletBalance += topUpAmount;
-      updateWalletDisplay();
-      showToast(`${formatCurrency(topUpAmount)} added to wallet.`);
+      openRazorpayCheckout({
+        amount: topUpAmount,
+        service: 'Wallet Top-up',
+        type: 'wallet',
+        metadata: { amount: topUpAmount, service: 'Wallet Top-up', link: '' }
+      });
     }
 
     function copyUPI() {
@@ -1084,7 +1173,7 @@
       document.getElementById('track-order-id').textContent = match.id;
       document.getElementById('track-service').textContent = match.service;
       document.getElementById('track-status').textContent = match.status;
-      document.getElementById('track-eta').textContent = match.eta;
+      document.getElementById('track-eta').textContent = match.eta || '2-4 Hours';
       result.classList.add('visible');
     }
 

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PHEONIX SMM Admin</title>
+  <style>
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body {
+      margin: 0;
+      background: #0f0f12;
+      color: #fff;
+      padding: 24px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-box {
+      background: #1c1c21;
+      border: 1px solid #2b2b33;
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .stat-label { color: #9ca3af; font-size: 12px; }
+    .stat-value { font-size: 26px; font-weight: 700; margin-top: 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #18181c;
+      border: 1px solid #2b2b33;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #27272a;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #1b1b20;
+      color: #fff;
+    }
+    select, button {
+      border-radius: 8px;
+      border: 1px solid #3b3b42;
+      padding: 10px 12px;
+      background: #121214;
+      color: #fff;
+    }
+    button {
+      cursor: pointer;
+      background: #ff5500;
+      border-color: #ff5500;
+      font-weight: 700;
+    }
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(255, 85, 0, 0.12);
+      color: #ffb28b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>PHEONIX SMM Admin</h1>
+      <a href="/" style="color:#ffb28b; text-decoration:none;">Back to App</a>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Service</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Link</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody id="orders-body"></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function loadAdminData() {
+      const [ordersRes, summaryRes] = await Promise.all([
+        fetch('/api/admin/orders'),
+        fetch('/api/admin/summary')
+      ]);
+
+      const ordersData = await ordersRes.json();
+      const summaryData = await summaryRes.json();
+
+      const stats = document.getElementById('stats');
+      stats.innerHTML = `
+        <div class="stat-box">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value">${summaryData.summary.totalOrders}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Revenue</div>
+          <div class="stat-value">₹${Number(summaryData.summary.totalRevenue).toLocaleString('en-IN')}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Paid Orders</div>
+          <div class="stat-value">${summaryData.summary.paidOrders}</div>
+        </div>
+      `;
+
+      const body = document.getElementById('orders-body');
+      if (!ordersData.orders.length) {
+        body.innerHTML = '<tr><td colspan="7">No orders found.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = ordersData.orders.map((order) => `
+        <tr>
+          <td>${order.id}</td>
+          <td>${order.type}</td>
+          <td>${order.service || 'Wallet Top-up'}</td>
+          <td>₹${Number(order.amount || 0).toLocaleString('en-IN')}</td>
+          <td><span class="tag">${order.status}</span></td>
+          <td>${order.link || '—'}</td>
+          <td>
+            <select data-order-id="${order.id}">
+              <option value="paid" ${order.status === 'paid' ? 'selected' : ''}>Paid</option>
+              <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
+              <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>Completed</option>
+              <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
+            <button onclick="updateStatus(this.closest('tr').querySelector('select').dataset.orderId, this.closest('tr').querySelector('select').value)">Save</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function updateStatus(orderId, status) {
+      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Order status updated.');
+        loadAdminData();
+      } else {
+        alert(data.message || 'Failed to update order.');
+      }
+    }
+
+    loadAdminData();
+  </script>
+</body>
+</html>
