@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - PHEONIX SMM</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    :root {
+      --bg: #121214;
+      --panel: #1c1c21;
+      --accent: #ff5500;
+      --text: #ffffff;
+      --muted: #8e8e93;
+      --border: #2a2a32;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .auth-card {
+      background-color: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .auth-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .auth-logo {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .auth-tagline {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .form-input {
+      background-color: #141418;
+      border: 1px solid #2d2d38;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+    }
+
+    .form-input::placeholder {
+      color: #666670;
+    }
+
+    .btn-auth {
+      background-color: var(--accent);
+      color: var(--text);
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-auth:hover {
+      background-color: #e04b00;
+    }
+
+    .btn-auth:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .auth-toggle {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .auth-toggle a {
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .auth-toggle a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .success-message {
+      background-color: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    .admin-badge {
+      background-color: rgba(255, 85, 0, 0.1);
+      border: 1px solid rgba(255, 85, 0, 0.3);
+      color: #ffb28b;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      text-align: center;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">🔥 PHEONIX SMM</div>
+        <p class="auth-tagline">Social Media Marketing</p>
+      </div>
+
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+
+      <!-- Login Form -->
+      <div id="login-form-container">
+        <div class="admin-badge">Demo Admin: orphictushar@gmail.com / admin123</div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input type="email" id="login-email" class="form-input" placeholder="your@email.com" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="Enter your password" />
+        </div>
+
+        <button class="btn-auth" id="login-btn" onclick="handleLogin()">Login</button>
+
+        <div class="auth-toggle">
+          Don't have an account? <a onclick="switchForm('register')">Register here</a>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-form-container" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="register-name">Full Name</label>
+          <input type="text" id="register-name" class="form-input" placeholder="Your name" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="register-email">Email Address</label>
+          <input type="email" id="register-email" class="form-input" placeholder="your@email.com" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="register-password">Password</label>
+          <input type="password" id="register-password" class="form-input" placeholder="Min 6 characters" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="register-confirm">Confirm Password</label>
+          <input type="password" id="register-confirm" class="form-input" placeholder="Re-enter password" />
+        </div>
+
+        <button class="btn-auth" id="register-btn" onclick="handleRegister()">Create Account</button>
+
+        <div class="auth-toggle">
+          Already have an account? <a onclick="switchForm('login')">Login here</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    function switchForm(form) {
+      const loginForm = document.getElementById('login-form-container');
+      const registerForm = document.getElementById('register-form-container');
+      const errorMsg = document.getElementById('error-message');
+      const successMsg = document.getElementById('success-message');
+
+      errorMsg.classList.remove('show');
+      successMsg.classList.remove('show');
+
+      if (form === 'register') {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'flex';
+      } else {
+        loginForm.style.display = 'flex';
+        registerForm.style.display = 'none';
+      }
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+      const errorMsg = document.getElementById('error-message');
+      const loginBtn = document.getElementById('login-btn');
+
+      if (!email || !password) {
+        errorMsg.textContent = 'Email and password are required.';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+
+      const result = await login(email, password);
+
+      if (result.success) {
+        localStorage.setItem('pheonix_user', JSON.stringify(result.user));
+        window.location.href = result.user.role === 'admin' ? '/admin' : '/';
+      } else {
+        errorMsg.textContent = result.message || 'Login failed.';
+        errorMsg.classList.add('show');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+      }
+    }
+
+    async function handleRegister() {
+      const name = document.getElementById('register-name').value.trim();
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value.trim();
+      const confirm = document.getElementById('register-confirm').value.trim();
+      const errorMsg = document.getElementById('error-message');
+      const successMsg = document.getElementById('success-message');
+      const registerBtn = document.getElementById('register-btn');
+
+      if (!name || !email || !password || !confirm) {
+        errorMsg.textContent = 'All fields are required.';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      if (password.length < 6) {
+        errorMsg.textContent = 'Password must be at least 6 characters.';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      if (password !== confirm) {
+        errorMsg.textContent = 'Passwords do not match.';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      registerBtn.disabled = true;
+      registerBtn.textContent = 'Creating account...';
+
+      const result = await register(name, email, password);
+
+      if (result.success) {
+        localStorage.setItem('pheonix_user', JSON.stringify(result.user));
+        successMsg.textContent = 'Account created! Redirecting...';
+        successMsg.classList.add('show');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+      } else {
+        errorMsg.textContent = result.message || 'Registration failed.';
+        errorMsg.classList.add('show');
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'Create Account';
+      }
+    }
+
+    // Check if already logged in
+    window.addEventListener('load', async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        window.location.href = user.role === 'admin' ? '/admin' : '/';
+      }
+    });
+  </script>
+</body>
+</html>
