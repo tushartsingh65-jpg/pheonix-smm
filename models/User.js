@@ -16,14 +16,4 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.passwordHash);
 };
 
-userSchema.statics.findByCredentials = async function (email, password) {
-  const user = await this.findOne({ email });
-  if (!user) return null;
-
-  const isMatch = await user.comparePassword(password);
-  if (!isMatch) return null;
-
-  return user;
-};
-
 module.exports = mongoose.models.User || mongoose.model('User', userSchema);
